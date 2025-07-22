@@ -1,0 +1,103 @@
+{
+    "name": "rbxtsc-speed-test",
+    "build": {
+        "dockerfile": "./dockerfile",
+        "context": ".."
+    },
+    "shutdownAction": "stopContainer",
+    "workspaceFolder": "/workspace",
+    "mounts": [
+        "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+    ],
+    "forwardPorts": [
+        34872
+    ],
+    "postCreateCommand": "bash ./scripts/shell/postStart.sh",
+    "remoteUser": "root",
+    "containerEnv": {
+        "NODE_ENV": "development"
+    },
+    "customizations": {
+        "vscode": {
+            "settings": {
+                // Editor
+                "editor.defaultFormatter": "esbenp.prettier-vscode",
+                "editor.bracketPairColorization.enabled": true,
+                "editor.formatOnSaveMode": "file",
+                "editor.formatOnType": false,
+                "editor.insertSpaces": true,
+                "editor.formatOnSave": true,
+                // Files
+                "files.autoSave": "onFocusChange",
+                // Terminal
+                "terminal.integrated.fontFamily": "'Monaspace Radon Frozen', 'FiraCode Nerd Font'",
+                "terminal.integrated.defaultProfile.windows": "Git Bash",
+                // Prettier
+                "prettier.bracketSameLine": false,
+                "prettier.trailingComma": "none",
+                "prettier.semi": false,
+                "prettier.tabWidth": 4,
+                // Jest
+                "jest.jestCommandLine": "npm run test:jest --",
+                "jest.runMode": "on-demand",
+                // Cuddle
+                "cuddle.display.highlightWholeLine": "never",
+                "cuddle.detection.requireClosingText": true,
+                "cuddle.display.drawConnectingLines": true,
+                // Type Script
+                "typescript.tsserver.path": "./node_modules/typescript/lib/tsserver.js",
+                "typescript.tsdk": "./node_modules/typescript/lib",
+                "typescript.enablePromptUseWorkspaceTsdk": true,
+                "typescript.format.semicolons": "insert",
+                // Java Scripts
+                "javascript.format.semicolons": "insert",
+                // Ignores / Excludes
+                "luau-lsp.ignoreGlobs": [
+                    "**/node_modules/**",
+                    "**/old_common/**",
+                    "**/include/**",
+                    "**/scripts/**",
+                    "**/network/**",
+                    "**/_Index/**",
+                    "**/dist/**",
+                    "**/out/**"
+                ],
+                "search.exclude": {
+                    "node_modules": true,
+                    "old_common": true,
+                    "include": true,
+                    "dist": true,
+                    "out": true
+                },
+                // Formatters
+                "[shellscript]": {
+                    "editor.defaultFormatter": "mkhl.shfmt"
+                }
+            },
+            "extensions": [
+                "VisualStudioExptTeam.intellicode-api-usage-examples",
+                "VisualStudioExptTeam.vscodeintellicode-completions",
+                "VisualStudioExptTeam.vscodeintellicode",
+                "christian-kohler.npm-intellisense",
+                "DavidAnson.vscode-markdownlint",
+                "github.vscode-github-actions",
+                "roblox-ts.vscode-roblox-ts",
+                "foxundermoon.shell-format",
+                "tamasfe.even-better-toml",
+                "donjayamanne.githistory",
+                "dbaeumer.vscode-eslint",
+                "esbenp.prettier-vscode",
+                "johnnymorganz.luau-lsp",
+                "ms-vscode.live-server",
+                "Gruntfuggly.todo-tree",
+                "JohnnyMorganz.stylua",
+                "johnnymorganz.stylua",
+                "filiptibell.deputy",
+                "Orta.vscode-jest",
+                "eamodio.gitlens",
+                "dphfox.cuddle",
+                "mkhl.shfmt"
+            ]
+        }
+    }
+}

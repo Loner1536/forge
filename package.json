@@ -1,0 +1,13 @@
+{
+    "name": "forge",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "build": "rbxtsc",
+        "watch": "rbxtsc -w"
+    },
+    "license": "ISC",
+    "keywords": [],
+    "author": ""
+}
