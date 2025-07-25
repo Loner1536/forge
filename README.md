@@ -1,6 +1,6 @@
 # forge
 
-> ⚡ A reactive window state manager for [@rbxts/vide](https://github.com/roblox-ts/vide)
+> ⚡ A reactive window state manager for [@rbxts/vide github:](https://github.com/littensy/vide) or [@rbxts/vide npm:](https://www.npmjs.com/package/@rbxts/vide?activeTab=code)
 
 Forge simplifies managing visibility, hierarchy, and transitions of UI components in Roblox using `@rbxts/vide`. It provides a declarative API for showing/hiding windows, handling parents, and applying animated transitions using `spring`, `source`, and `effect`.
 
