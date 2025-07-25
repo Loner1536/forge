@@ -1,30 +1,32 @@
-import { Source, effect } from "@rbxts/vide";
+// Packages
+import { Source, effect } from "@rbxts/vide"
 
-const trackSources = new Map<GuiObject, Source<boolean>>();
-const parentMap = new Map<GuiObject, GuiObject>(); // child -> parent
+const trackSources = new Map<GuiObject, Source<boolean>>()
+const parentMap = new Map<GuiObject, GuiObject>()
 
 export default function track(
     mainComponent: GuiObject,
     parentComponent: GuiObject | undefined,
     visibleSource: Source<boolean>,
-    parentVisibleSource?: Source<boolean>,
+    parentVisibleSource?: Source<boolean>
 ): Source<boolean> {
-    trackSources.set(mainComponent, visibleSource);
-    if (parentComponent) parentMap.set(mainComponent, parentComponent);
+    trackSources.set(mainComponent, visibleSource)
+    if (parentComponent) parentMap.set(mainComponent, parentComponent)
 
     effect(() => {
-        const isVisible = visibleSource();
-        const parentVisible = parentVisibleSource?.();
+        const isVisible = visibleSource()
+        const parentVisible = parentVisibleSource?.()
 
         if (parentVisibleSource && !parentVisible && isVisible) {
-            visibleSource(false);
-            return;
+            visibleSource(false)
+            return
         }
 
         if (isVisible && (parentVisibleSource === undefined || parentVisible)) {
             task.defer(() => {
                 for (const [otherComponent, otherSource] of trackSources) {
-                    const isChildOfUs = parentMap.get(otherComponent) === mainComponent;
+                    const isChildOfUs =
+                        parentMap.get(otherComponent) === mainComponent
 
                     if (
                         otherComponent !== mainComponent &&
@@ -32,12 +34,12 @@ export default function track(
                         !isChildOfUs &&
                         otherSource()
                     ) {
-                        otherSource(false);
+                        otherSource(false)
                     }
                 }
-            });
+            })
         }
-    });
+    })
 
-    return visibleSource;
+    return visibleSource
 }

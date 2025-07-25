@@ -1,18 +1,17 @@
 {
-    "name": "rbxtsc-speed-test",
+    "name": "roblox-ts-forge",
     "build": {
-        "dockerfile": "./dockerfile",
+        "dockerfile": "Dockerfile",
         "context": ".."
     },
     "shutdownAction": "stopContainer",
     "workspaceFolder": "/workspace",
     "mounts": [
-        "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+        "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
     ],
     "forwardPorts": [
         34872
     ],
-    "postCreateCommand": "bash ./scripts/shell/postStart.sh",
     "remoteUser": "root",
     "containerEnv": {
         "NODE_ENV": "development"
@@ -37,9 +36,6 @@
                 "prettier.trailingComma": "none",
                 "prettier.semi": false,
                 "prettier.tabWidth": 4,
-                // Jest
-                "jest.jestCommandLine": "npm run test:jest --",
-                "jest.runMode": "on-demand",
                 // Cuddle
                 "cuddle.display.highlightWholeLine": "never",
                 "cuddle.detection.requireClosingText": true,
@@ -72,6 +68,12 @@
                 // Formatters
                 "[shellscript]": {
                     "editor.defaultFormatter": "mkhl.shfmt"
+                },
+                "[typescript]": {
+                    "editor.defaultFormatter": "esbenp.prettier-vscode"
+                },
+                "[json]": {
+                    "editor.defaultFormatter": "esbenp.prettier-vscode"
                 }
             },
             "extensions": [
