@@ -87,9 +87,6 @@ local function setupCanvasComponent(cfg)
 				Size = UDim2.fromScale(1, 1),
 				Interactable = false,
 				ZIndex = function()
-					if cfg.popup then
-						return 5
-					end
 					if cfg.parent then
 						return 2
 					end
@@ -151,18 +148,15 @@ local function setupCanvasComponent(cfg)
 			return springVisibility() < 0.9
 		end,
 		ZIndex = function()
-			if cfg.popup then
-				return 5
-			end
 			if cfg.parent then
-				return mainComponent.ZIndex
+				return 2
+			end
+			local _value = visibleSource() and cfg.zIndex
+			if _value ~= 0 and _value == _value and _value then
+				return cfg.zIndex
 			end
 			if visibleSource() and cfg.window then
-				local _condition_1 = cfg.zIndex
-				if _condition_1 == nil then
-					_condition_1 = 3
-				end
-				return _condition_1
+				return 3
 			end
 			if not visibleSource() and cfg.window then
 				return 2
