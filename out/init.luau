@@ -90,12 +90,12 @@ local function setupCanvasComponent(cfg)
 					if cfg.parent then
 						return 2
 					end
+					local _value = visibleSource() and cfg.zIndex
+					if _value ~= 0 and _value == _value and _value then
+						return cfg.zIndex
+					end
 					if visibleSource() and cfg.window then
-						local _condition_1 = cfg.zIndex
-						if _condition_1 == nil then
-							_condition_1 = 3
-						end
-						return _condition_1
+						return 3
 					end
 					if not visibleSource() and cfg.window then
 						return 2

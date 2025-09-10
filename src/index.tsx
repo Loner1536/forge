@@ -63,7 +63,8 @@ function setupCanvasComponent<TArgs extends unknown[], TParentArgs extends unkno
                     Interactable={false}
                     ZIndex={() => {
                         if (cfg.parent) return 2
-                        if (visibleSource() && cfg.window) return cfg.zIndex ?? 3
+                        if (visibleSource() && cfg.zIndex) return cfg.zIndex
+                        if (visibleSource() && cfg.window) return 3
                         if (!visibleSource() && cfg.window) return 2
                         return 1
                     }}
