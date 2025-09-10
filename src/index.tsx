@@ -62,7 +62,6 @@ function setupCanvasComponent<TArgs extends unknown[], TParentArgs extends unkno
                     Size={UDim2.fromScale(1, 1)}
                     Interactable={false}
                     ZIndex={() => {
-                        if (cfg.popup) return 5
                         if (cfg.parent) return 2
                         if (visibleSource() && cfg.window) return cfg.zIndex ?? 3
                         if (!visibleSource() && cfg.window) return 2
@@ -112,9 +111,9 @@ function setupCanvasComponent<TArgs extends unknown[], TParentArgs extends unkno
     apply(mainComponent)({
         Visible: () => springVisibility() < 0.9,
         ZIndex: () => {
-            if (cfg.popup) return 5
-            if (cfg.parent) return mainComponent.ZIndex
-            if (visibleSource() && cfg.window) return cfg.zIndex ?? 3
+            if (cfg.parent) return 2
+            if (visibleSource() && cfg.zIndex) return cfg.zIndex
+            if (visibleSource() && cfg.window) return 3
             if (!visibleSource() && cfg.window) return 2
             return 1
         }

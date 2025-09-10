@@ -7,19 +7,18 @@ export type TrackedWindow = {
     children: Record<string, Source<boolean>>
 }
 
-export interface ForgeParentConfig<TParentArgs extends unknown[] = unknown[]> {
+export type ForgeParentConfig<TParentArgs extends unknown[] = unknown[]> = {
     component: (...args: TParentArgs) => GuiObject | Node
     visible: Source<boolean>
     original: GuiObject
     args?: TParentArgs
 }
 
-export interface ForgeConfig<TArgs extends unknown[] = unknown[], TParentArgs extends unknown[] = unknown[]> {
+export type ForgeConfig<TArgs extends unknown[] = unknown[], TParentArgs extends unknown[] = unknown[]> = {
     component: (...args: TArgs) => GuiObject | Node
     visible: Source<boolean>
     fadeSpeed: number
     window?: boolean
-    popup?: boolean
     zIndex?: number
     args?: TArgs
     fullyClosed?: () => void
