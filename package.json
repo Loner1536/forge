@@ -1,17 +1,17 @@
 {
     "name": "@rbxts/forge",
-    "version": "0.0.1",
-    "description": "A window library for handeling frames using Vide",
-    "main": "src/init.lua",
-    "types": "src/index.d.ts",
+    "version": "1.0.1",
+    "description": "reactive window state manager for vide",
+    "main": "out/init.luau",
+    "types": "out/index.d.ts",
     "scripts": {
-        "build": "rbxtsc --rojo dev.project.json --noInclude"
+        "build": "rbxtsc --rojo dev.project.json --noInclude --luau"
     },
     "keywords": [
         "roblox-ts",
-        "@rbxts/vide"
+        "vide"
     ],
-    "author": "loner",
+    "author": "loner1536",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -22,7 +22,10 @@
     },
     "homepage": "https://github.com/Loner1536/forge",
     "files": [
-        "src"
+        "out",
+        "!**/*.tsbuildinfo",
+        "!**/*.spec.lua",
+        "!**/*.spec.d.ts"
     ],
     "publishConfig": {
         "access": "public"
@@ -37,10 +40,13 @@
         "eslint-plugin-prettier": "^5.2.1",
         "eslint-plugin-roblox-ts": "^0.0.36",
         "prettier": "^3.3.3",
-        "roblox-ts": "2.3.0-dev-539482e",
+        "roblox-ts": "^3.0.0",
         "typescript": "^5.5.4"
     },
     "dependencies": {
+        "@rbxts/vide": "^0.5.7"
+    },
+    "peerDependencies": {
         "@rbxts/vide": "^0.5.7"
     }
 }

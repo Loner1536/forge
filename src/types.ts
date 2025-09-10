@@ -14,15 +14,13 @@ export interface ForgeParentConfig<TParentArgs extends unknown[] = unknown[]> {
     args?: TParentArgs
 }
 
-export interface ForgeConfig<
-    TArgs extends unknown[] = unknown[],
-    TParentArgs extends unknown[] = unknown[]
-> {
+export interface ForgeConfig<TArgs extends unknown[] = unknown[], TParentArgs extends unknown[] = unknown[]> {
     component: (...args: TArgs) => GuiObject | Node
     visible: Source<boolean>
     fadeSpeed: number
     window?: boolean
     popup?: boolean
+    zIndex?: number
     args?: TArgs
     fullyClosed?: () => void
     parent?: ForgeParentConfig<TParentArgs>
