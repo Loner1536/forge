@@ -35,7 +35,7 @@ function setupCanvasComponent<TArgs extends unknown[], TParentArgs extends unkno
 
     const mainComponent = component(...(componentArgs as TArgs)) as GuiObject
 
-    if (cfg.window) track(mainComponent, parentConfig?.original, cfg.visible, parentConfig?.visible)
+    if (cfg.window || cfg.parent) track(mainComponent, parentConfig?.original, cfg.visible, parentConfig?.visible)
 
     let parentClone: GuiObject | undefined
     if (parentComponent) {

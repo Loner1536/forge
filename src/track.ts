@@ -1,4 +1,3 @@
-// Packages
 import { Source, effect } from "@rbxts/vide"
 
 const trackSources = new Map<GuiObject, Source<boolean>>()
@@ -17,23 +16,31 @@ export default function track(
         const isVisible = visibleSource()
         const parentVisible = parentVisibleSource?.()
 
+        // Rule 1: Cannot be visible if parent exists and is not visible
+        print(parentVisibleSource && !parentVisible && isVisible)
         if (parentVisibleSource && !parentVisible && isVisible) {
+            print(`[Auto-GUI] Hiding ${mainComponent.Name} because its parent is not visible`)
             visibleSource(false)
             return
         }
 
+        // Rule 2: Cannot be visible if it has children
+        for (const [child, childSource] of trackSources) {
+            if (parentMap.get(child) === mainComponent && childSource()) {
+                if (isVisible) {
+                    visibleSource(false)
+                }
+                return
+            }
+        }
+
+        // Rule 3: If visible, hide all unrelated siblings
         if (isVisible && (parentVisibleSource === undefined || parentVisible)) {
             task.defer(() => {
                 for (const [otherComponent, otherSource] of trackSources) {
-                    const isChildOfUs =
-                        parentMap.get(otherComponent) === mainComponent
+                    const isChildOfUs = parentMap.get(otherComponent) === mainComponent
 
-                    if (
-                        otherComponent !== mainComponent &&
-                        otherComponent !== parentComponent &&
-                        !isChildOfUs &&
-                        otherSource()
-                    ) {
+                    if (otherComponent !== mainComponent && otherComponent !== parentComponent && !isChildOfUs && otherSource()) {
                         otherSource(false)
                     }
                 }

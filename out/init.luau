@@ -41,7 +41,7 @@ local function setupCanvasComponent(cfg)
 	end
 	local parentArgs = _condition
 	local mainComponent = component(unpack(componentArgs))
-	if cfg.window then
+	if cfg.window or cfg.parent then
 		local _result_1 = parentConfig
 		if _result_1 ~= nil then
 			_result_1 = _result_1.original
