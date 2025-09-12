@@ -17,9 +17,7 @@ export default function track(
         const parentVisible = parentVisibleSource?.()
 
         // Rule 1: Cannot be visible if parent exists and is not visible
-        print(parentVisibleSource && !parentVisible && isVisible)
         if (parentVisibleSource && !parentVisible && isVisible) {
-            print(`[Auto-GUI] Hiding ${mainComponent.Name} because its parent is not visible`)
             visibleSource(false)
             return
         }
