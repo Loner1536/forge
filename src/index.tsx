@@ -2,57 +2,36 @@
 import Vide from "@rbxts/vide"
 
 // Types
-import type * as Types from "./types"
+import type { ForgeConfig } from "./types"
 
 // Components
 import track from "./track"
 
-// Vide Components
 const { source, mount, apply, effect, spring } = Vide
 
-// Module variables
-let rendered = false
-let canvasFolder: Folder | undefined
-
-type ForgeModuleAPI = {
-    add<TArgs extends unknown[], TParentArgs extends unknown[]>(config: Types.ForgeConfig<TArgs, TParentArgs>): GuiObject
-    render(gui?: GuiObject | ScreenGui): void
-}
-
-function setupCanvasComponent<TArgs extends unknown[], TParentArgs extends unknown[]>(
-    cfg: Types.ForgeConfig<TArgs, TParentArgs>
-): GuiObject {
-    assert(cfg.component, "[Forge Setup] 'component' is required in config")
-    assert(cfg.visible, "[Forge Setup] 'visible' source is required in config")
-    assert(cfg.args, "[Forge Setup] 'args' is required in config")
+function setupCanvasComponent<TArgs extends unknown[]>(forge: Forge, cfg: ForgeConfig<TArgs>, parent?: GuiObject): GuiObject {
+    assert(cfg.component, "[Forge] 'component' is required in config")
+    assert(cfg.visible, "[Forge] 'visible' source is required in config")
 
     const component = cfg.component
     const componentArgs = cfg.args ?? []
-    const parentConfig = cfg.parent
     const visibleSource = cfg.visible
-    const parentComponent = parentConfig?.component
-    const parentArgs = parentConfig?.args ?? []
 
     const mainComponent = component(...(componentArgs as TArgs)) as GuiObject
 
-    if (cfg.window || cfg.parent) track(mainComponent, parentConfig?.original, cfg.visible, parentConfig?.visible)
-
-    let parentClone: GuiObject | undefined
-    if (parentComponent) {
-        parentClone = parentComponent(...(parentArgs as TParentArgs)) as GuiObject
-        parentClone?.GetChildren().forEach((child) => child.Destroy())
+    // If parent was passed, mount under it later
+    if (cfg.window && parent) {
+        track(mainComponent, parent, cfg.visible, cfg.visible)
     }
 
-    let canvas: CanvasGroup
-
-    const springVisibility = spring(() => (visibleSource() ? 0 : 1), cfg.fadeSpeed, 0.8)
+    const springVisibility = spring(() => (visibleSource() ? 0 : 1), cfg.fadeSpeed ? cfg.fadeSpeed : forge._defaultFadeSpeed(), 0.8)
     const isSpringOpen = source(false)
     const wasFullyClosed = source(false)
 
     task.defer(() => {
         const containPosInHierarchy = mainComponent.Parent
         mount(() => {
-            canvas = (
+            const canvas = (
                 <canvasgroup
                     Name={mainComponent.Name}
                     BackgroundTransparency={1}
@@ -62,13 +41,12 @@ function setupCanvasComponent<TArgs extends unknown[], TParentArgs extends unkno
                     Size={UDim2.fromScale(1, 1)}
                     Interactable={false}
                     ZIndex={() => {
-                        if (cfg.parent) return 2
                         if (visibleSource() && cfg.zIndex) return cfg.zIndex
                         if (visibleSource() && cfg.window) return 3
                         if (!visibleSource() && cfg.window) return 2
                         return 1
                     }}
-                    Parent={canvasFolder}
+                    Parent={forge.canvasFolder}
                 />
             ) as CanvasGroup
 
@@ -91,28 +69,21 @@ function setupCanvasComponent<TArgs extends unknown[], TParentArgs extends unkno
                 }
 
                 if (!visible) {
-                    mainComponent.Parent = parentClone ?? canvas
+                    mainComponent.Parent = canvas
                 } else if (visible && isSpringOpen()) {
-                    mainComponent.Parent = parentConfig?.original ?? containPosInHierarchy
+                    mainComponent.Parent = containPosInHierarchy
                 }
             })
 
             return canvas
         })
 
-        if (parentClone) {
-            parentClone.Name = "Parent Imitation"
-            parentClone.Parent = canvas!
-            mainComponent.Parent = parentClone
-        } else {
-            mainComponent.Parent = canvas!
-        }
+        mainComponent.Parent = mainComponent.Parent ?? forge.canvasFolder
     })
 
     apply(mainComponent)({
         Visible: () => springVisibility() < 0.9,
         ZIndex: () => {
-            if (cfg.parent) return 2
             if (visibleSource() && cfg.zIndex) return cfg.zIndex
             if (visibleSource() && cfg.window) return 3
             if (!visibleSource() && cfg.window) return 2
@@ -120,28 +91,66 @@ function setupCanvasComponent<TArgs extends unknown[], TParentArgs extends unkno
         }
     })
 
+    // Recursively set up children
+    if (cfg.children) {
+        for (const child of cfg.children) {
+            setupCanvasComponent(forge, child, mainComponent)
+        }
+    }
+
     return mainComponent
 }
 
-const Forge: ForgeModuleAPI = {
-    add<TArgs extends unknown[], TParentArgs extends unknown[]>(config: Types.ForgeConfig<TArgs, TParentArgs>): GuiObject {
-        assert(typeIs(config, "table"), "[Forge] Expected a config table as the first argument.")
-        assert(rendered, "[Forge] Forge.render() must be called before creating components.")
-        assert(canvasFolder, "[Forge] canvasFolder not initialized. Call Forge.render() first.")
+export class Forge {
+    private rendered = false
+    public canvasFolder?: Folder
+    public readonly _defaultFadeSpeed: Vide.Source<number>
+    private components: Record<string, GuiObject> = {}
 
-        return setupCanvasComponent(config)
-    },
+    constructor(configs: ForgeConfig<any>[], gui: GuiObject | ScreenGui, defaultFadeSpeed = 0.25) {
+        this._defaultFadeSpeed = source(defaultFadeSpeed)
 
-    render(gui?: GuiObject | ScreenGui): void {
-        assert(!rendered, "[Forge.render] Forge.render() cannot be called more than once.")
+        this.render(gui)
+
+        for (const cfg of configs) {
+            this.setupComponent(cfg)
+        }
+    }
+
+    private setupComponent(cfg: ForgeConfig<any>, parent?: GuiObject) {
+        const comp = setupCanvasComponent(this, cfg, parent)
+
+        // store by the GuiObject's Name
+        this.components[comp.Name] = comp
+
+        // recursively handle children
+        if (cfg.children) {
+            for (const child of cfg.children) {
+                this.setupComponent(child, comp)
+            }
+        }
+
+        return comp
+    }
+
+    /** Get a component by its GuiObject Name */
+    public get(name: string): GuiObject | undefined {
+        return this.components[name]
+    }
+
+    /** Update the default fadeSpeed reactively for all components that do not override */
+    public fadeSpeed(value: number) {
+        this._defaultFadeSpeed(value)
+    }
+
+    private render(gui: GuiObject | ScreenGui) {
+        assert(!this.rendered, "[Forge.render] Cannot be called more than once per Forge instance.")
         assert(gui, "[Forge.render] A GuiObject or ScreenGui must be provided.")
         if (!gui.IsA("GuiObject") && !gui.IsA("ScreenGui")) {
             error("[Forge.render] Argument must be a GuiObject or ScreenGui.")
         }
 
-        rendered = true
-        canvasFolder = (<folder Name={"CanvasGroup Fades"} Parent={gui} />) as Folder
+        this.rendered = true
+        this.canvasFolder = (<folder Name={"CanvasGroup Fades"} Parent={gui} />) as Folder
     }
 }
-
-export default Forge
