@@ -24,7 +24,7 @@ function setupCanvasComponent<TArgs extends unknown[]>(forge: Forge, cfg: ForgeC
         track(mainComponent, parent, cfg.visible, cfg.visible)
     }
 
-    const springVisibility = spring(() => (visibleSource() ? 0 : 1), cfg.fadeSpeed ? cfg.fadeSpeed : forge._defaultFadeSpeed(), 0.8)
+    const springVisibility = spring(() => (visibleSource() ? 0 : 1), cfg.fadeSpeed ? cfg.fadeSpeed : 0.25, 0.8)
     const isSpringOpen = source(false)
     const wasFullyClosed = source(false)
 
@@ -101,15 +101,12 @@ function setupCanvasComponent<TArgs extends unknown[]>(forge: Forge, cfg: ForgeC
     return mainComponent
 }
 
-export class Forge {
+export default class Forge {
     private rendered = false
     public canvasFolder?: Folder
-    public readonly _defaultFadeSpeed: Vide.Source<number>
     private components: Record<string, GuiObject> = {}
 
-    constructor(configs: ForgeConfig<any>[], gui: GuiObject | ScreenGui, defaultFadeSpeed = 0.25) {
-        this._defaultFadeSpeed = source(defaultFadeSpeed)
-
+    constructor(configs: ForgeConfig<any>[], gui: GuiObject | ScreenGui) {
         this.render(gui)
 
         for (const cfg of configs) {
@@ -120,10 +117,8 @@ export class Forge {
     private setupComponent(cfg: ForgeConfig<any>, parent?: GuiObject) {
         const comp = setupCanvasComponent(this, cfg, parent)
 
-        // store by the GuiObject's Name
         this.components[comp.Name] = comp
 
-        // recursively handle children
         if (cfg.children) {
             for (const child of cfg.children) {
                 this.setupComponent(child, comp)
@@ -133,14 +128,8 @@ export class Forge {
         return comp
     }
 
-    /** Get a component by its GuiObject Name */
     public get(name: string): GuiObject | undefined {
         return this.components[name]
-    }
-
-    /** Update the default fadeSpeed reactively for all components that do not override */
-    public fadeSpeed(value: number) {
-        this._defaultFadeSpeed(value)
     }
 
     private render(gui: GuiObject | ScreenGui) {

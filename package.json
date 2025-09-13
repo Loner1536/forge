@@ -1,6 +1,6 @@
 {
     "name": "@rbxts/forge",
-    "version": "1.1.7-beta.0",
+    "version": "1.1.4-alpha.1",
     "description": "reactive window state manager for vide",
     "main": "out/init.luau",
     "types": "out/index.d.ts",

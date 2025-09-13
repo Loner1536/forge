@@ -28,7 +28,7 @@ local function setupCanvasComponent(forge, cfg, parent)
 		return if visibleSource() then 0 else 1
 	end
 	local _value = cfg.fadeSpeed
-	local springVisibility = spring(_exp, if _value ~= 0 and _value == _value and _value then cfg.fadeSpeed else forge._defaultFadeSpeed(), 0.8)
+	local springVisibility = spring(_exp, if _value ~= 0 and _value == _value and _value then cfg.fadeSpeed else 0.25, 0.8)
 	local isSpringOpen = source(false)
 	local wasFullyClosed = source(false)
 	task.defer(function()
@@ -120,13 +120,9 @@ do
 		local self = setmetatable({}, Forge)
 		return self:constructor(...) or self
 	end
-	function Forge:constructor(configs, gui, defaultFadeSpeed)
-		if defaultFadeSpeed == nil then
-			defaultFadeSpeed = 0.25
-		end
+	function Forge:constructor(configs, gui)
 		self.rendered = false
 		self.components = {}
-		self._defaultFadeSpeed = source(defaultFadeSpeed)
 		self:render(gui)
 		for _, cfg in configs do
 			self:setupComponent(cfg)
@@ -134,9 +130,7 @@ do
 	end
 	function Forge:setupComponent(cfg, parent)
 		local comp = setupCanvasComponent(self, cfg, parent)
-		-- store by the GuiObject's Name
 		self.components[comp.Name] = comp
-		-- recursively handle children
 		if cfg.children then
 			for _, child in cfg.children do
 				self:setupComponent(child, comp)
@@ -146,9 +140,6 @@ do
 	end
 	function Forge:get(name)
 		return self.components[name]
-	end
-	function Forge:fadeSpeed(value)
-		self._defaultFadeSpeed(value)
 	end
 	function Forge:render(gui)
 		local _arg0 = not self.rendered
@@ -166,5 +157,5 @@ do
 	end
 end
 return {
-	Forge = Forge,
+	default = Forge,
 }
