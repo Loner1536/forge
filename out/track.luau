@@ -20,9 +20,7 @@ local function track(mainComponent, parentComponent, visibleSource, parentVisibl
 		end
 		local parentVisible = _parentVisible
 		-- Rule 1: Cannot be visible if parent exists and is not visible
-		print(parentVisibleSource and not parentVisible and isVisible)
 		if parentVisibleSource and not parentVisible and isVisible then
-			print(`[Auto-GUI] Hiding {mainComponent.Name} because its parent is not visible`)
 			visibleSource(false)
 			return nil
 		end
